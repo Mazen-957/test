@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deepfake Detector AI - El Shorouk Academy Graduation Project</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0b0f19',
+                            800: '#111827',
+                            700: '#1f2937',
+                            600: '#374151'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for Timeline Graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-dark-900 text-slate-100 min-h-screen flex flex-col md:flex-row overflow-x-hidden selection:bg-indigo-500 selection:text-white">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-full md:w-72 bg-dark-800 border-r border-slate-800 flex flex-col justify-between shrink-0 z-20">
+        <div>
+            <!-- Logo & Academy Header -->
+            <div class="p-6 border-b border-slate-800/80">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                        <i class="fa-solid fa-shield-halved text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1
+                            class="font-bold text-base tracking-wide bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+                            Deepfake AI</h1>
+                        <span class="text-xs text-indigo-400 font-medium">El Shorouk Academy</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-4 space-y-1.5">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
+                    <i class="fa-solid fa-chart-pie w-5"></i>
+                    <span>Dashboard (DB)</span>
+                </button>
+                <button onclick="switchTab('upload')" id="nav-upload"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-700/50">
+                    <i class="fa-solid fa-cloud-arrow-up w-5"></i>
+                    <span>Upload & Process (UP/PR)</span>
+                </button>
+                <button onclick="switchTab('report')" id="nav-report"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-700/50">
+                    <i class="fa-solid fa-file-waveform w-5"></i>
+                    <span>Analysis Report (AR/AD)</span>
+                </button>
+                <button onclick="switchTab('history')" id="nav-history"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-700/50">
+                    <i class="fa-solid fa-clock-rotate-left w-5"></i>
+                    <span>History (AH)</span>
+                </button>
+                <button onclick="switchTab('profile')" id="nav-profile"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-700/50">
+                    <i class="fa-solid fa-user-gear w-5"></i>
+                    <span>My Profile (MP)</span>
+                </button>
+                <button onclick="switchTab('support')" id="nav-support"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-700/50">
+                    <i class="fa-solid fa-headset w-5"></i>
+                    <span>Help & Support (HS)</span>
+                </button>
+                <button onclick="switchTab('about')" id="nav-about"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-700/50">
+                    <i class="fa-solid fa-circle-info w-5"></i>
+                    <span>About Project (AP)</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Sidebar Footer / Student Card -->
+        <div class="p-4 border-t border-slate-800/80 m-4 rounded-xl bg-slate-900/50">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center font-bold text-sm text-white">
+                    MA
+                </div>
+                <div class="overflow-hidden">
+                    <h4 class="text-sm font-semibold truncate">Mazen Adel</h4>
+                    <p class="text-xs text-slate-400">ID: 324243533</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+
+        <!-- Top Navbar -->
+        <header
+            class="h-20 bg-dark-800/80 backdrop-blur border-b border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
+            <div class="flex items-center gap-4">
+                <h2 id="page-title" class="text-xl font-bold tracking-tight text-white">Dashboard Overview</h2>
+                <span
+                    class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> AI Model Active (MTCNN v2.4)
+                </span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="switchTab('upload')"
+                    class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-medium text-sm shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-plus"></i> New Analysis
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Container -->
+        <div class="p-8 max-w-7xl mx-auto w-full flex-1">
+
+            <!-- ================= 1. DASHBOARD TAB ================= -->
+            <section id="tab-dashboard" class="space-y-6">
+                <!-- Welcome Banner -->
+                <div
+                    class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900/40 via-purple-900/30 to-slate-800/50 p-8 border border-indigo-500/20">
+                    <div class="relative z-10 max-w-2xl">
+                        <span
+                            class="text-xs font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">Graduation
+                            Project 2026</span>
+                        <h2 class="text-3xl font-extrabold text-white mt-3">Welcome back, Mazen!</h2>
+                        <p class="text-slate-300 mt-2 text-sm leading-relaxed">
+                            El Shorouk Academy Deepfake Detection System is fully operational. Upload any video to run
+                            deep spatial-temporal neural network inference and verify authenticity instantly.
+                        </p>
+                        <div class="mt-6 flex gap-4">
+                            <button onclick="switchTab('upload')"
+                                class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition shadow-lg shadow-indigo-600/30">
+                                Upload Video Now
+                            </button>
+                            <button onclick="switchTab('about')"
+                                class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-sm transition border border-slate-700">
+                                Learn Architecture
+                            </button>
+                        </div>
+                    </div>
+                    <div class="absolute right-6 -bottom-10 opacity-10 pointer-events-none">
+                        <i class="fa-solid fa-brain text-[220px]"></i>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div
+                        class="bg-dark-800/60 backdrop-blur p-6 rounded-2xl border border-slate-700/50 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Analyzed</p>
+                            <h3 class="text-3xl font-bold text-white mt-1">1,428</h3>
+                            <span class="text-xs text-emerald-400 font-medium mt-1 inline-block"><i
+                                    class="fa-solid fa-arrow-trend-up">+12% this week</i></span>
+                        </div>
+                        <div
+                            class="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-video"></i>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-dark-800/60 backdrop-blur p-6 rounded-2xl border border-slate-700/50 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Fake Detected</p>
+                            <h3 class="text-3xl font-bold text-rose-400 mt-1">384</h3>
+                            <span class="text-xs text-rose-400 font-medium mt-1 inline-block"><i
+                                    class="fa-solid fa-triangle-exclamation">26.8% forgery rate</i></span>
+                        </div>
+                        <div
+                            class="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-user-secret"></i>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-dark-800/60 backdrop-blur p-6 rounded-2xl border border-slate-700/50 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Real Verified</p>
+                            <h3 class="text-3xl font-bold text-emerald-400 mt-1">1,044</h3>
+                            <span class="text-xs text-emerald-400 font-medium mt-1 inline-block"><i
+                                    class="fa-solid fa-circle-check">Authentic media</i></span>
+                        </div>
+                        <div
+                            class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-shield-check"></i>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-dark-800/60 backdrop-blur p-6 rounded-2xl border border-slate-700/50 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Avg Process Time
+                            </p>
+                            <h3 class="text-3xl font-bold text-white mt-1">4.2s</h3>
+                            <span class="text-xs text-indigo-400 font-medium mt-1 inline-block"><i
+                                    class="fa-solid fa-bolt">GPU Accelerated</i></span>
+                        </div>
+                        <div
+                            class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-gauge-high"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Cards -->
+                <div class="bg-dark-800/60 backdrop-blur rounded-2xl border border-slate-700/50 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="font-bold text-lg text-white">Recent Analysis Sessions</h3>
+                        <button onclick="switchTab('history')"
+                            class="text-sm font-medium text-indigo-400 hover:text-indigo-300">View All History <i
+                                class="fa-solid fa-arrow-right ml-1"></i></button>
+                    </div>
+                    <div class="space-y-3">
+                        <div
+                            class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-between transition hover:border-slate-700">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-sm text-white">Video_20261115_Interview_Test.mp4</h4>
+                                    <p class="text-xs text-slate-400">Analyzed 12 mins ago • 14.2 MB • 0:15 duration</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span
+                                    class="px-3 py-1 rounded-full text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">FAKE
+                                    (94%)</span>
+                                <button onclick="switchTab('report')"
+                                    class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 transition">View
+                                    Report</button>
+                            </div>
+                        </div>
+                        <div
+                            class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-between transition hover:border-slate-700">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-sm text-white">Press_Conference_Official.mp4</h4>
+                                    <p class="text-xs text-slate-400">Analyzed 3 hours ago • 28.5 MB • 0:45 duration</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span
+                                    class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">REAL
+                                    (99%)</span>
+                                <button onclick="switchTab('report')"
+                                    class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 transition">View
+                                    Report</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= 2. UPLOAD & PROCESSING TAB (UP & PR) ================= -->
+            <section id="tab-upload" class="space-y-6 hidden">
+                <div class="bg-dark-800/60 backdrop-blur rounded-2xl border border-slate-700/50 p-8">
+                    <div class="max-w-xl mx-auto text-center space-y-3">
+                        <span
+                            class="text-xs font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">Step
+                            1: Input Video</span>
+                        <h2 class="text-2xl font-bold text-white">Upload Video for Deepfake Analysis</h2>
+                        <p class="text-slate-400 text-sm">Supported formats: MP4, AVI, MOV, MKV (Max size: 100MB)</p>
+                    </div>
+
+                    <!-- Drag and Drop Box -->
+                    <div id="drop-zone"
+                        class="mt-8 border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-2xl p-10 text-center cursor-pointer transition bg-slate-900/40 relative">
+                        <input type="file" id="video-file-input" class="absolute inset-0 opacity-0 cursor-pointer"
+                            accept="video/*" onchange="handleFileSelected(event)">
+                        <div id="upload-prompt" class="space-y-4">
+                            <div
+                                class="w-16 h-16 rounded-2xl bg-indigo-600/10 text-indigo-400 flex items-center justify-center text-2xl mx-auto shadow-inner">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white">Drag & drop your video file here, or <span
+                                        class="text-indigo-400 underline">browse</span></h4>
+                                <p class="text-xs text-slate-500 mt-1">AI models will analyze face landmarks & temporal
+                                    consistency</p>
+                            </div>
+                        </div>
+                        <div id="file-selected-info" class="hidden space-y-3">
+                            <div
+                                class="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl mx-auto">
+                                <i class="fa-solid fa-file-video"></i>
+                            </div>
+                            <div>
+                                <h4 id="selected-file-name" class="font-bold text-white text-base">filename.mp4</h4>
+                                <p id="selected-file-size" class="text-xs text-emerald-400 mt-1">Ready for neural
+                                    analysis</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="mt-8 text-center">
+                        <button onclick="startAnalysis()" id="start-analysis-btn" disabled
+                            class="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-600 disabled:cursor-not-allowed text-white font-semibold text-sm transition shadow-lg shadow-indigo-600/20">
+                            Start AI Pipeline Analysis <i class="fa-solid fa-wand-magic-sparkles ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PROCESSING STAGES BOX (PR) -->
+                <div id="processing-container"
+                    class="hidden bg-dark-800/60 backdrop-blur rounded-2xl border border-slate-700/50 p-8 space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span
+                                class="text-xs font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">Step
+                                2: AI Pipeline Execution</span>
+                            <h3 class="text-xl font-bold text-white mt-2">Processing Video Frames...</h3>
+                        </div>
+                        <div class="text-right">
+                            <span id="progress-percentage" class="text-2xl font-black text-indigo-400">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-slate-900 rounded-full h-3 overflow-hidden border border-slate-700">
+                        <div id="progress-bar-fill"
+                            class="bg-gradient-to-r from-indigo-500 to-violet-500 h-full w-0 transition-all duration-300">
+                        </div>
+                    </div>
+
+                    <!-- Pipeline Steps Indicators -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
+                        <div id="step-1"
+                            class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center gap-3 transition">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center shrink-0 step-icon">
+                                <i class="fa-solid fa-spinner animate-spin"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-bold text-white">1. Frame Extraction</h5>
+                                <p class="text-[11px] text-slate-400">Decoding video into raw frames</p>
+                            </div>
+                        </div>
+                        <div id="step-2"
+                            class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center gap-3 transition">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center shrink-0 step-icon">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-bold text-white">2. MTCNN Face Detection</h5>
+                                <p class="text-[11px] text-slate-400">Cropping & aligning facial ROIs</p>
+                            </div>
+                        </div>
+                        <div id="step-3"
+                            class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center gap-3 transition">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center shrink-0 step-icon">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-bold text-white">3. Temporal Analysis</h5>
+                                <p class="text-[11px] text-slate-400">Checking frame consistency</p>
+                            </div>
+                        </div>
+                        <div id="step-4"
+                            class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center gap-3 transition">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center shrink-0 step-icon">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-bold text-white">4. Model Inference</h5>
+                                <p class="text-[11px] text-slate-400">Classifying FAKE / REAL score</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= 3. ANALYSIS REPORT, RESULT & DETAILS TAB (AR & AD) ================= -->
+            <section id="tab-report" class="space-y-6 hidden">
+                <!-- Report Header Bar -->
+                <div
+                    class="bg-dark-800/60 backdrop-blur rounded-2xl border border-slate-700/50 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span
+                            class="text-xs font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">Analysis
+                            Report (AR & AD)</span>
+                        <h2 class="text-xl font-bold text-white mt-2">Deepfake Forensic Audit Report</h2>
+                        <p class="text-slate-400 text-xs mt-1">Video: <span
+                                class="text-white font-medium">Video_20261115_Test.mp4</span> • Duration: 0:15s •
+                            Analyzed by Mazen Adel (El Shorouk Academy)</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="exportPDFReport()"
+                            class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs border border-slate-700 transition flex items-center gap-2">
+                            <i class="fa-solid fa-download"></i> Export PDF Report
+                        </button>
+                        <button onclick="switchTab('upload')"
+                            class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition shadow-lg shadow-indigo-600/30 flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> New Analysis
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AR (Analysis Result Card) -->
+                <div
+                    class="bg-gradient-to-r from-rose-950/40 via-dark-800 to-dark-800 rounded-2xl border border-rose-500/30 p-8 flex flex-col md:flex-row items-center justify-between gap-8 shadow-xl">
+                    <div class="flex items-center gap-6">
+                        <div class="relative w-28 h-28 flex items-center justify-center shrink-0">
+                            <!-- Circular SVG Indicator -->
+                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                <path class="text-slate-800" stroke-width="3.5" stroke="currentColor" fill="none"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831">
+                                </path>
+                                <path class="text-rose-500" stroke-dasharray="94, 100" stroke-width="3.5"
+                                    stroke-linecap="round" stroke="currentColor" fill="none"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831">
+                                </path>
+                            </svg>
+                            <div class="absolute text-center">
+                                <span class="text-2xl font-extrabold text-white">94%</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span
+                                class="px-3 py-1 rounded-full text-xs font-black bg-rose-500/20 text-rose-400 border border-rose-500/40 uppercase tracking-widest">FAKE
+                                DETECTED</span>
+                            <h3 class="text-3xl font-extrabold text-white mt-2">High Forgery Probability</h3>
+                            <p class="text-slate-300 text-sm mt-1">Deep spatial-temporal anomalies detected around mouth
+                                and jaw regions in frames 120-340.</p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 text-right shrink-0">
+                        <p class="text-xs text-slate-400">Model Used: <strong class="text-white">MTCNN +
+                                XceptionNet</strong></p>
+                        <p class="text-xs text-slate-400 mt-1">Confidence Score: <strong
+                                class="text-rose-400">94.2%</strong></p>
+                        <p class="text-xs text-slate-400 mt-1">Processing Time: <strong class="text-white">3.8
+                                seconds</strong></p>
+                    </div>
+                </div>
+
+                <!-- AD (Analysis Details & Timeline) -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Timeline Graph (2 Cols) -->
+                    <div
+                        class="lg:col-span-2 bg-dark-800/60 backdrop-blur rounded-2xl border border-slate-700/50 p-6 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-base text-white">Forgery Score Spikes Over Time (Timeline)
+                                </h3>
+                                <span class="text-xs text-slate-400">0:00 - 0:15 Sec</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mb-4">Red spikes indicate moments where facial tampering
+                                probability exceeded the 85% threshold.</p>
+                        </div>
+                        <!-- Canvas Chart -->
+                        <div class="w-full h-64 relative">
+                            <canvas id="timelineChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Keyframes & Detected Faces Grid (1 Col) -->
+                    <div class="bg-dark-800/60 backdrop-blur rounded-2xl border border-slate-700/50 p-6 flex flex-col">
+                        <h3 class="font-bold text-base text-white mb-2">Extracted Keyframes & Faces</h3>
+                        <p class="text-xs text-slate-400 mb-4">MTCNN bounding box ROIs analyzed by neural net.</p>
+                        <div class="grid grid-cols-3 gap-3 overflow-y-auto max-h-[270px] pr-1">
+                            <div
+                                class="relative rounded-lg overflow-hidden border-2 border-rose-500 group bg-slate-900">
+                                <img src="https://placehold.co/150x150/1e1926/ef4444?text=Face+1"
+                                    class="w-full h-20 object-cover opacity-90 group-hover:scale-105 transition"
+                                    alt="Keyframe">
+                                <span
+                                    class="absolute bottom-0 inset-x-0 bg-rose-600/90 text-white text-[9px] font-bold text-center py-0.5">FAKE
+                                    (96%)</span>
+                            </div>
+                            <div
+                                class="relative rounded-lg overflow-hidden border-2 border-rose-500 group bg-slate-900">
+                                <img src="https://placehold.co/150x150/1e1926/ef4444?text=Face+2"
+                                    class="w-full h-20 object-cover opacity-90 group-hover:scale-105 transition"
+                                    alt="Keyframe">
+                                <span
+                                    class="absolute bottom-0 inset-x-0 bg-rose-600/90 text-white text-[9px] font-bold text-center py-0.5">FAKE
+                                    (92%)</span>
+                            </div>
+                            <div
+                                class="relative rounded-lg overflow-hidden border-2 border-emerald-500 group bg-slate-900">
+                                <img src="https://placehold.co/150x150/1e1926/10b981?text=Face+3"
+                                    class="w-full h-20 object-cover opacity-90 group-hover:scale-105 transition"
+                                    alt="Keyframe">
+                                <span
+                                    class="absolute bottom-0 inset-x-0 bg-emerald-600/90 text-white text-[9px] font-bold text-center py-0.5">REAL
+                                    (91%)</span>
+                            </div>
+                            <div
+                                class="relative rounded-lg overflow-hidden border-2 border-rose-500 group bg-slate-900">
+                                <img src="https://placehold.co/150x150/1e1926/ef4444?text=Face+4"
+                                    class="w-full h-20 object-cover opacity-90 group-hover:scale-105 transition"
+                                    alt="Keyframe">
+                                <span
+                                    class="absolute bottom-0 inset-x-0 bg-rose-600/90 text-white text-[9px] font-bold text-center py-0.5">FAKE
+                                    (89%)</span>
+                            </div>
+                            <div
+                                class="relative rounded-lg overflow-hidden border-2 border-emerald-500 group bg-slate-900">
+                                <img src="https://placehold.co/150x150/1e1926/10b981?text=Face+5"
+                                    class="w-full h-20 object-cover opacity-90 group-hover:scale-105 transition"
+                                    alt="Keyframe">
+                                <span
+                                    class="absolute bottom-0 inset-x-0 bg-emerald-600/90 text-white text-[9px] font-bold text-center py-0.5">REAL
+                                    (95%)</span>
+                            </div>
+                            <div
+                                class="relative rounded-lg overflow-hidden border-2 border-emerald-500 group bg-slate-900">
+                                <img src="https://placehold.co/150x150/1e1926/10b981?text=Face+6"
+                                    class="w-full h-20 object-cover opacity-90 group-hover:scale-105 transition"
+                                    alt="Keyframe">
+                                <span
+                                    class="absolute bottom-0 inset-x-0 bg-emerald-600/90 text-white text-[9px] font-bold text-center py-0.5">REAL
+                                    (98%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= 4. ANALYSIS HISTORY TAB (AH) ================= -->
+            <section id="tab-history" class="space-y-6 hidden">
+                <div class="bg-dark-800/60 backdrop-blur rounded-2xl border border-slate-700/50 p-6 space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <span
+                                class="text-xs font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">Archive
+                                & Logs</span>
+                            <h2 class="text-xl font-bold text-white mt-2">Analysis History (AH)</h2>
+                            <p class="text-slate-400 text-xs mt-1">All previously analyzed videos stored in the
+                                database.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="relative">
+                                <i
+                                    class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-500 text-xs"></i>
+                                <input type="text" placeholder="Search filename..."
+                                    class="bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 w-64">
+                            </div>
+                            <button onclick="showToast('History list refreshed', 'success')"
+                                class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs border border-slate-700 transition">
+                                <i class="fa-solid fa-rotate mr-1"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- History Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr
+                                    class="border-b border-slate-800 text-slate-400 text-xs font-semibold uppercase tracking-wider">
+                                    <th class="py-3 px-4">Filename</th>
+                                    <th class="py-3 px-4">Date & Time</th>
+                                    <th class="py-3 px-4">Duration</th>
+                                    <th class="py-3 px-4">Result</th>
+                                    <th class="py-3 px-4">Confidence</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60 text-sm">
+                                <tr class="hover:bg-slate-900/40 transition">
+                                    <td class="py-3 px-4 font-medium text-white flex items-center gap-2"><i
+                                            class="fa-solid fa-file-video text-indigo-400"></i> Video_20261115_Test.mp4
+                                    </td>
+                                    <td class="py-3 px-4 text-slate-400 text-xs">Nov 15, 2026 - 19:42</td>
+                                    <td class="py-3 px-4 text-slate-400 text-xs">0:15s</td>
+                                    <td class="py-3 px-4"><span
+                                            class="px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">FAKE</span>
+                                    </td>
+                                    <td class="py-3 px-4 text-rose-400 font-bold text-xs">94.2%</td>
+                                    <td class="py-3 px-4 text-right">
+                                        <button onclick="switchTab('report')"
+                                            class="px-3 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 text-xs font-semibold transition">View
+                                            Report</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-900/40 transition">
+                                    <td class="py-3 px-4 font-medium text-white flex items-center gap-2"><i
+                                            class="fa-solid fa-file-video text-indigo-400"></i>
+                                        Press_Conference_Official.mp4</td>
+                                    <td class="py-3 px-4 text-slate-400 text-xs">Nov 15, 2026 - 16:10</td>
+                                    <td class="py-3 px-4 text-slate-400 text-xs">0:45s</td>
+                                    <td class="py-3 px-4"><span
+                                            class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">REAL</span>
+                                    </td>
+                                    <td class="py-3 px-4 text-emerald-400 font-bold text-xs">99.1%</td>
+                                    <td class="py-3 px-4 text-right">
+                                        <button onclick="switchTab('report')"
+                                            class="px-3 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 text-xs font-semibold transition">View
+                                            Report</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-900/40 transition">
+                                    <td class="py-3 px-4 font-medium text-white flex items-center gap-2"><i
+                                            class="fa-solid fa-file-video text-indigo-400"></i>
+                                        Speech_Broadcast_2026.mp4</td>
+                                    <td class="py-3 px-4 text-slate-400 text-xs">Nov 14, 2026 - 22:15</td>
+                                    <td class="py-3 px-4 text-slate-400 text-xs">1:12s</td>
+                                    <td class="py-3 px-4"><span
+                                            class="px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">FAKE</span>
+                                    </td>
+                                    <td class="py-3 px-4 text-rose-400 font-bold text-xs">88.7%</td>
+                                    <td class="py-3 px-4 text-right">
+                                        <button onclick="switchTab('report')"
+                                            class="px-3 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 text-xs font-semibold transition">View
+                                            Report</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-900/40 transition">
+                                    <td class="py-3 px-4 font-medium text-white flex items-center gap-2"><i
+                                            class="fa-solid fa-file-video text-indigo-400"></i> Campus_Tour_Shorouk.mp4
+                                    </td>
+                                    <td class="py-3 px-4 text-slate-400 text-xs">Nov 14, 2026 - 14:05</td>
+                                    <td class="py-3 px-4 text-slate-400 text-xs">2:30s</td>
+                                    <td class="py-3 px-4"><span
+                                            class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">REAL</span>
+                                    </td>
+                                    <td class="py-3 px-4 text-emerald-400 font-bold text-xs">99.8%</td>
+                                    <td class="py-3 px-4 text-right">
+                                        <button onclick="switchTab('report')"
+                                            class="px-3 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 text-xs font-semibold transition">View
+                                            Report</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= 5. MY PROFILE TAB (MP) ================= -->
+            <section id="tab-profile" class="space-y-6 hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Profile Card -->
+                    <div
+                        class="bg-dark-800/60 backdrop-blur rounded-2xl border border-slate-700/50 p-6 text-center space-y-4">
+                        <div
+                            class="w-24 h-24 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-3xl font-bold text-white mx-auto shadow-xl shadow-indigo-500/20">
+                            MA
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-white">Mazen Adel</h3>
+                            <p class="text-xs text-indigo-400 font-medium mt-1">Student ID: 324243533</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Section 6 • El Shorouk Academy</p>
+                        </div>
+                        <div class="pt-4 border-t border-slate-800 text-left space-y-2 text-xs">
+                            <div class="flex justify-between py-1"><span class="text-slate-400">Department:</span>
+                                <strong class="text-white">Computer Science</strong>
+                            </div>
+                            <div class="flex justify-between py-1"><span class="text-slate-400">Project Role:</span>
+                                <strong class="text-white">Lead AI & Fullstack Developer</strong>
+                            </div>
+                            <div class="flex justify-between py-1"><span class="text-slate-400">Account Status:</span>
+                                <span class="text-emerald-400 font-bold">Active</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit Profile & Password Form (2 Cols) -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-dark-800/60 backdrop-blur rounded-2xl border border-slate-700/50 p-6 space-y-4">
+                            <h3 class="font-bold text-base text-white">Edit Personal Information</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1">Full Name</label>
+                                    <input type="text" value="Mazen Adel"
+                                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1">Student ID</label>
+                                    <input type="text" value="324243533" readonly
+                                        class="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-500 cursor-not-allowed">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1">Academy Email</label>
+                                    <input type="email" value="mazen.adel@sha.edu.eg"
+                                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1">Section /
+                                        Group</label>
+                                    <input type="text" value="Section 6"
+                                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                                </div>
+                            </div>
+                            <div class="pt-2 text-right">
+                                <button onclick="showToast('Profile updated successfully!', 'success')"
+                                    class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition shadow-lg shadow-indigo-600/20">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-dark-800/60 backdrop-blur rounded-2xl border border-slate-700/50 p-6 space-y-4">
+                            <h3 class="font-bold text-base text-white">Change Password</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1">Current
+                                        Password</label>
+                                    <input type="password" placeholder="••••••••"
+                                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1">New Password</label>
+                                    <input type="password" placeholder="••••••••"
+                                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1">Confirm New
+                                        Password</label>
+                                    <input type="password" placeholder="••••••••"
+                                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                                </div>
+                            </div>
+                            <div class="pt-2 text-right">
+                                <button onclick="showToast('Password changed successfully!', 'success')"
+                                    class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs border border-slate-700 transition">
+                                    Update Password
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= 6. HELP & SUPPORT TAB (HS) ================= -->
+            <section id="tab-support" class="space-y-6 hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- FAQ Accordion -->
+                    <div class="bg-dark-800/60 backdrop-blur rounded-2xl border border-slate-700/50 p-6 space-y-4">
+                        <span
+                            class="text-xs font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">Knowledge
+                            Base</span>
+                        <h3 class="text-xl font-bold text-white">Frequently Asked Questions</h3>
+
+                        <div class="space-y-3 pt-2">
+                            <div class="border border-slate-800 rounded-xl bg-slate-900/50 overflow-hidden">
+                                <button onclick="toggleFaq(this)"
+                                    class="w-full p-4 text-left font-semibold text-sm text-white flex justify-between items-center">
+                                    <span>How accurate is the Deepfake detection model?</span>
+                                    <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform"></i>
+                                </button>
+                                <div
+                                    class="hidden p-4 pt-0 text-xs text-slate-400 leading-relaxed border-t border-slate-800/60">
+                                    Our system combines MTCNN for robust face alignment with a trained XceptionNet
+                                    neural network achieving over 97.4% accuracy on benchmark datasets.
+                                </div>
+                            </div>
+                            <div class="border border-slate-800 rounded-xl bg-slate-900/50 overflow-hidden">
+                                <button onclick="toggleFaq(this)"
+                                    class="w-full p-4 text-left font-semibold text-sm text-white flex justify-between items-center">
+                                    <span>What video formats and max sizes are supported?</span>
+                                    <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform"></i>
+                                </button>
+                                <div
+                                    class="hidden p-4 pt-0 text-xs text-slate-400 leading-relaxed border-t border-slate-800/60">
+                                    We support MP4, AVI, MKV, and MOV formats up to 100MB per upload session for
+                                    real-time GPU processing.
+                                </div>
+                            </div>
+                            <div class="border border-slate-800 rounded-xl bg-slate-900/50 overflow-hidden">
+                                <button onclick="toggleFaq(this)"
+                                    class="w-full p-4 text-left font-semibold text-sm text-white flex justify-between items-center">
+                                    <span>How does the timeline forgery spike work?</span>
+                                    <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform"></i>
+                                </button>
+                                <div
+                                    class="hidden p-4 pt-0 text-xs text-slate-400 leading-relaxed border-t border-slate-800/60">
+                                    The timeline graph evaluates frame-by-frame temporal consistency. Spikes indicate
+                                    timestamps with anomalies characteristic of generative AI face-swapping.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Issue Submission Form -->
+                    <div class="bg-dark-800/60 backdrop-blur rounded-2xl border border-slate-700/50 p-6 space-y-4">
+                        <span
+                            class="text-xs font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">Technical
+                            Assistance</span>
+                        <h3 class="text-xl font-bold text-white">Report an Issue or Feedback</h3>
+
+                        <div class="space-y-4 pt-2">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Your Name</label>
+                                <input type="text" value="Mazen Adel"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Issue Category</label>
+                                <select
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                                    <option>Model Inference Error</option>
+                                    <option>Video Upload Failure</option>
+                                    <option>UI / Dashboard Bug</option>
+                                    <option>Other General Inquiry</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Message
+                                    Description</label>
+                                <textarea rows="4" placeholder="Describe the problem or feedback..."
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 text-xs text-white focus:outline-none focus:border-indigo-500"></textarea>
+                            </div>
+                            <div class="text-right">
+                                <button onclick="showToast('Support ticket submitted successfully!', 'success')"
+                                    class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition shadow-lg shadow-indigo-600/20">
+                                    Submit Ticket
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= 7. ABOUT PROJECT TAB (AP) ================= -->
+            <section id="tab-about" class="space-y-6 hidden">
+                <div class="bg-dark-800/60 backdrop-blur rounded-2xl border border-slate-700/50 p-8 space-y-6">
+                    <div class="max-w-3xl">
+                        <span
+                            class="text-xs font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">Graduation
+                            Project Documentation</span>
+                        <h2 class="text-3xl font-extrabold text-white mt-3">Deepfake Detection & Forensic System</h2>
+                        <p class="text-slate-300 text-sm mt-3 leading-relaxed">
+                            Developed as a premier graduation project for <strong>El Shorouk Academy</strong> (Computer
+                            Science Department), this system leverages state-of-the-art computer vision and deep
+                            learning architectures to identify manipulated video media and AI-generated face-swapping
+                            with high precision.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+                        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-face-viewfinder"></i>
+                            </div>
+                            <h4 class="font-bold text-white text-base">MTCNN Face Extraction</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed">Multi-task Cascaded Convolutional Networks
+                                accurately detect and align facial regions across challenging video frames.</p>
+                        </div>
+                        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-wave-square"></i>
+                            </div>
+                            <h4 class="font-bold text-white text-base">Temporal Analysis</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed">Evaluates consistency between consecutive
+                                frames to catch artifacts introduced by generative deep learning models.</p>
+                        </div>
+                        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <h4 class="font-bold text-white text-base">Instant Forensic UI</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed">Delivers real-time confidence scores,
+                                timeline spikes, and keyframe bounding box grids for clear audit reports.</p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="p-6 rounded-2xl bg-slate-900/40 border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div>
+                            <h4 class="font-bold text-white text-sm">Project Team & Supervision</h4>
+                            <p class="text-xs text-slate-400 mt-1">Lead Developer: Mazen Adel (ID: 324243533, Section 6)
+                                • El Shorouk Academy 2026</p>
+                        </div>
+                        <button onclick="showToast('Documentation PDF downloaded', 'success')"
+                            class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs border border-slate-700 transition">
+                            <i class="fa-solid fa-file-pdf mr-1"></i> Download Abstract
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- JAVASCRIPT LOGIC & INTERACTIVITY -->
+    <script>
+        // Tab Switching Logic
+        const tabs = ['dashboard', 'upload', 'report', 'history', 'profile', 'support', 'about'];
+        const titles = {
+            dashboard: 'Dashboard Overview',
+            upload: 'Upload & AI Pipeline Processing',
+            report: 'Forensic Analysis Report & Details',
+            history: 'Analysis History Archive',
+            profile: 'My Profile & Account Settings',
+            support: 'Help & Support Center',
+            about: 'About Project Architecture'
+        };
+
+        function switchTab(tabId) {
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const nav = document.getElementById(`nav-${t}`);
+                if (el) el.classList.add('hidden');
+                if (nav) {
+                    nav.className = 'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-700/50';
+                }
+            });
+
+            const activeEl = document.getElementById(`tab-${tabId}`);
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeEl) activeEl.classList.remove('hidden');
+            if (activeNav) {
+                activeNav.className = 'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-600/20';
+            }
+
+            document.getElementById('page-title').innerText = titles[tabId] || 'Dashboard';
+
+            // If report tab, initialize chart if not already
+            if (tabId === 'report') {
+                setTimeout(initTimelineChart, 100);
+            }
+        }
+
+        // Toast Notification Function
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-3 rounded-xl text-xs font-semibold shadow-xl border flex items-center gap-3 transition-all transform translate-y-2 opacity-0 ${type === 'success' ? 'bg-slate-900 border-emerald-500/40 text-emerald-400' : 'bg-slate-900 border-rose-500/40 text-rose-400'
+                }`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check text-emerald-400' : 'fa-circle-exclamation text-rose-400'}"></i> ${message}`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // File Upload Simulation
+        function handleFileSelected(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('upload-prompt').classList.add('hidden');
+                document.getElementById('file-selected-info').classList.remove('hidden');
+                document.getElementById('selected-file-name').innerText = file.name;
+                document.getElementById('selected-file-size').innerText = `${(file.size / (1024 * 1024)).toFixed(2)} MB • Ready for AI Pipeline`;
+                document.getElementById('start-analysis-btn').disabled = false;
+                showToast('Video file loaded successfully', 'success');
+            }
+        }
+
+        // Start Processing Simulation
+        function startAnalysis() {
+            document.getElementById('processing-container').classList.remove('hidden');
+            document.getElementById('start-analysis-btn').disabled = true;
+
+            let progress = 0;
+            const progressBar = document.getElementById('progress-bar-fill');
+            const progressText = document.getElementById('progress-percentage');
+
+            const interval = setInterval(() => {
+                progress += 2;
+                if (progress <= 100) {
+                    progressBar.style.width = `${progress}%`;
+                    progressText.innerText = `${progress}%`;
+
+                    // Update steps
+                    if (progress >= 25) updateStepStatus(1, 'completed');
+                    if (progress >= 50) updateStepStatus(2, 'completed');
+                    if (progress >= 75) updateStepStatus(3, 'completed');
+                    if (progress >= 100) {
+                        updateStepStatus(4, 'completed');
+                        clearInterval(interval);
+                        showToast('AI Pipeline analysis complete!', 'success');
+                        setTimeout(() => {
+                            switchTab('report');
+                        }, 1000);
+                    }
+                }
+            }, 60);
+        }
+
+        function updateStepStatus(stepNum, status) {
+            const stepEl = document.getElementById(`step-${stepNum}`);
+            if (status === 'completed') {
+                stepEl.className = 'p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-3 transition';
+                stepEl.querySelector('.step-icon').className = 'w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 step-icon';
+                stepEl.querySelector('.step-icon').innerHTML = '<i class="fa-solid fa-check"></i>';
+            }
+        }
+
+        // FAQ Accordion Toggle
+        function toggleFaq(btn) {
+            const content = btn.nextElementSibling;
+            const icon = btn.querySelector('.fa-chevron-down');
+            content.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        }
+
+        // Export PDF Simulation
+        function exportPDFReport() {
+            showToast('Generating PDF Forensic Report...', 'success');
+            setTimeout(() => {
+                showToast('Report downloaded successfully!', 'success');
+            }, 2000);
+        }
+
+        // Chart.js Timeline Graph
+        let timelineChartInstance = null;
+        function initTimelineChart() {
+            const ctx = document.getElementById('timelineChart');
+            if (!ctx) return;
+
+            if (timelineChartInstance) {
+                timelineChartInstance.destroy();
+            }
+
+            timelineChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['0s', '2s', '4s', '6s', '8s', '10s', '12s', '15s'],
+                    datasets: [{
+                        label: 'Forgery Score Probability',
+                        data: [12, 18, 92, 85, 22, 15, 96, 30],
+                        borderColor: '#f43f5e',
+                        backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.35,
+                        pointBackgroundColor: '#f43f5e',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94a3b8', font: { size: 10 } }
+                        },
+                        y: {
+                            min: 0,
+                            max: 100,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94a3b8', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
